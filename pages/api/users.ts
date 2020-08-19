@@ -5,7 +5,7 @@ export default (req, res) => {
   listUsers(prisma)
     .then((users) => {
       res.statusCode = 200;
-      res.json({ users });
+      res.json({ message: 'Ya basic!', users });
     })
     .catch(() => {
       res.statusCode = 500;
