@@ -2,6 +2,12 @@
 
 ## Development
 
+**Install Dependencies**
+
+```
+yarn
+```
+
 ### PostgreSQL Setup
 
 **postgresql@12** – I used the PostgreSQL EDB installer.
@@ -28,4 +34,16 @@ Create a database called `gmkit`.
 psql -d gmkit -U postgres -f schema.sql
 ```
 
-**Inspect the Database Schema with Prisma**
+### Prisma
+
+**Build the Prisma Schema**
+
+```bash
+npx prisma introspect
+```
+
+**Generating the Client**
+
+```bash
+npx prisma generate
+```
