@@ -47,3 +47,8 @@ npx prisma introspect
 ```bash
 npx prisma generate
 ```
+
+## Production
+
+- **Website Host:** Vercel
+- **DB Host:** Heroku

@@ -7,7 +7,8 @@ export default (req, res) => {
       res.statusCode = 200;
       res.json({ message: 'Ya basic!', users });
     })
-    .catch(() => {
+    .catch((e) => {
+      console.error(e);
       res.statusCode = 500;
       res.json({ message: 'Uh oh' });
     })
