@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import { requireAuth } from '@server/require-auth';
 
-export default (req, res) => {
+export default requireAuth((req, res) => {
   const prisma = new PrismaClient();
   listUsers(prisma)
     .then((users) => {
@@ -15,7 +16,7 @@ export default (req, res) => {
     .finally(() => {
       prisma.$disconnect();
     });
-};
+});
 
 async function listUsers(prisma: PrismaClient) {
   return prisma.user.findMany();
