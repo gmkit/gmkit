@@ -8,6 +8,12 @@
 yarn
 ```
 
+**Run Application**
+
+```
+yarn dev
+```
+
 ### PostgreSQL Setup
 
 **postgresql@12** – I used the PostgreSQL EDB installer.
@@ -28,13 +34,11 @@ Stack Builder Installation Directory: /Library/PostgreSQL/12
 
 Create a database called `gmkit`.
 
-**Load the Database Schema**
-
-```bash
-psql -d gmkit -U postgres -f schema.sql
-```
-
 ### Prisma
+
+**Environment Variables**
+
+Setup `prisma/.env`.
 
 **Updating the Database**
 
@@ -42,13 +46,17 @@ psql -d gmkit -U postgres -f schema.sql
 npx prisma migrate --experimental up
 ```
 
-**Generating the Client**
+**Generating the Prisma Client**
 
 ```bash
 npx prisma generate
 ````
 
+### Auth
+
+Create a GitHub OAuth app and set the credientails in `.env`.
+
 ## Production
 
-- **Website Host:** Vercel
-- **DB Host:** Heroku
+- **Website Host:** Vercel under the gmkit org
+- **DB Host:** Heroku under nolan@ncphi.com account
