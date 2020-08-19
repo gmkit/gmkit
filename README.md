@@ -36,17 +36,17 @@ psql -d gmkit -U postgres -f schema.sql
 
 ### Prisma
 
-**Build the Prisma Schema**
+**Updating the Database**
 
-```bash
-npx prisma introspect
+````bash
+npx prisma migrate --experimental up
 ```
 
 **Generating the Client**
 
 ```bash
 npx prisma generate
-```
+````
 
 ## Production
 

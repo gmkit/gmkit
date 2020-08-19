@@ -4,13 +4,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model User {
   id            Int       @default(autoincrement()) @id
   name          String?
-  email         String?   @unique
+  email         String    @unique
   emailVerified DateTime? @map(name: "email_verified")
   image         String?
   createdAt     DateTime  @default(now()) @map(name: "created_at")

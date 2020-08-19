@@ -1,0 +1,5 @@
+# Prisma Migrate lockfile v1
+
+20200819221033-update-user-model
+20200819222123-add-auth-models
+20200819222308-user-email-is-optional
