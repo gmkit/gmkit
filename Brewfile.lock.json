@@ -1,0 +1,19 @@
+{
+  "entries": {
+    "brew": {
+      "postgresql@12": null
+    }
+  },
+  "system": {
+    "macos": {
+      "catalina": {
+        "HOMEBREW_VERSION": "2.4.12",
+        "HOMEBREW_PREFIX": "/usr/local",
+        "Homebrew/homebrew-core": "60f55c746fb04ead2417df971238ca99dae7e9da",
+        "CLT": "1103.0.32.29",
+        "Xcode": "11.6",
+        "macOS": "10.15.6"
+      }
+    }
+  }
+}
