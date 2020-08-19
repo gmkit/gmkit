@@ -12,7 +12,7 @@ export default (req, res) => {
       res.json({ message: 'Uh oh' });
     })
     .finally(() => {
-      prisma.$disocnnect();
+      prisma.$disconnect();
     });
 };
 
