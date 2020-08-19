@@ -1,6 +1,6 @@
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
-import AuthButtons from '../components/auth-buttons';
+import styles from '@styles/Home.module.css';
+import AuthButtons from '@components/auth-buttons';
 
 export default function Home() {
   return (

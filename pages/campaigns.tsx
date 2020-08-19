@@ -1,4 +1,4 @@
-import { AuthenticationRequired } from '../components/authentication-required';
+import { AuthenticationRequired } from '@components/authentication-required';
 
 export default function CampaignListPage() {
   return (
