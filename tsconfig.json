@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@*": ["*"]
+      "@app/*": ["gmkit/*"]
     },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],

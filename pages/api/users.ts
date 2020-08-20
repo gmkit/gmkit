@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { requireAuth } from '@server/require-auth';
+import { requireAuth } from '@app/server/require-auth';
 
 export default requireAuth((req, res) => {
   const prisma = new PrismaClient();
