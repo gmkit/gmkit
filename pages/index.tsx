@@ -1,8 +1,34 @@
 import Head from 'next/head';
 import styles from '@app/styles/Home.module.css';
 import AuthButtons from '@app/components/auth-buttons';
+import campaigns from './api/campaigns';
+import { useState, useEffect } from 'react';
 
+const req = {
+  get(url: string) {
+    return fetch(url).then((response) => response.json());
+  },
+
+  post(url: string, body: any) {
+    return fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }).then((response) => response.json());
+  },
+};
+
+function useCampaigns() {
+  const [campaigns, setCampaigns] = useState([]);
+  useEffect(() => {
+    req.get('/api/campaigns').then(({ campaigns }) => {
+      setCampaigns(campaigns);
+    });
+  }, []);
+  return [campaigns];
+}
 export default function Home() {
+  const [campaigns] = useCampaigns();
+
   return (
     <div className={styles.container}>
       <Head>
@@ -17,36 +43,28 @@ export default function Home() {
 
         <p className={styles.description}>
           <AuthButtons />
+          <button
+            onClick={() => {
+              req
+                .post('/api/campaigns', {
+                  name: 'Example Campaign',
+                })
+                .then((data) => console.log(data));
+            }}
+          >
+            Create Campaign
+          </button>
         </p>
 
         <div className={styles.grid}>
-          <a href='https://nextjs.org/docs' className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href='https://nextjs.org/learn' className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href='https://github.com/vercel/next.js/tree/master/examples'
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href='https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+          {campaigns.map(({ campaign, role }) => {
+            return (
+              <div className={styles.card} key={campaign.id}>
+                <h3>{campaign.name}</h3>
+                <div>Role: {role}</div>
+              </div>
+            );
+          })}
         </div>
       </main>
 
