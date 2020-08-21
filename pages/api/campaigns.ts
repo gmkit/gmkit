@@ -11,46 +11,59 @@ export default requireAuth(async (req, res) => {
     },
   });
 
-  if (req.method === 'POST') {
-    try {
+  try {
+    if (req.method === 'POST') {
       const { name } = JSON.parse(req.body);
-      const campaign = await prisma.campaign.create({
-        data: {
-          name,
-          users: {
-            create: {
-              role: 'GM',
-              user: {
-                connect: {
-                  id: userId,
-                },
-              },
-            },
-          },
-        },
-      });
-
+      const campaign = await createCampaign(prisma, userId, name);
       res.status(200);
       res.json(campaign);
-    } catch (error) {
-      res.status(500);
-      res.json({ error });
+    } else {
+      const campaigns = findCampaignsForUser(prisma, userId);
+      res.status(200);
+      res.json({ campaigns });
     }
-  } else {
-    const user = await prisma.user.findOne({
-      where: {
-        id: userId,
-      },
-      include: {
-        campaigns: {
-          include: {
-            campaign: true,
-          },
-        },
-      },
-    });
-    res.status(200);
-    res.json({ campaigns: user.campaigns });
+  } catch (error) {
+    res.status(500);
+    res.json({ error });
   }
   prisma.$disconnect();
 });
+
+async function createCampaign(
+  prisma: PrismaClient,
+  userId: number,
+  name: string
+) {
+  const campaign = await prisma.campaign.create({
+    data: {
+      name,
+      users: {
+        create: {
+          role: 'GM',
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      },
+    },
+  });
+  return campaign;
+}
+
+async function findCampaignsForUser(prisma: PrismaClient, userId: number) {
+  const { campaigns } = await prisma.user.findOne({
+    where: {
+      id: userId,
+    },
+    include: {
+      campaigns: {
+        include: {
+          campaign: true,
+        },
+      },
+    },
+  });
+  return campaigns;
+}
