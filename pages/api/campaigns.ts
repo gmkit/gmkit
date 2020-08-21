@@ -33,7 +33,6 @@ export default requireAuth(async (req, res) => {
       res.status(200);
       res.json(campaign);
     } catch (error) {
-      console.log(error);
       res.status(500);
       res.json({ error });
     }
@@ -50,8 +49,6 @@ export default requireAuth(async (req, res) => {
         },
       },
     });
-    console.log(user.campaigns);
-
     res.status(200);
     res.json({ campaigns: user.campaigns });
   }

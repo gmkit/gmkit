@@ -9,10 +9,12 @@
   },
   "dependencies": {
     "@prisma/client": "^2.5.0",
+    "final-form": "^4.20.1",
     "next": "9.5.2",
     "next-auth": "^3.1.0",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "react-final-form": "^6.5.1"
   },
   "devDependencies": {
     "@prisma/cli": "^2.5.0",

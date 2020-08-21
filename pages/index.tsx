@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import styles from '@app/styles/Home.module.css';
 import AuthButtons from '@app/components/auth-buttons';
-import campaigns from './api/campaigns';
 import { useState, useEffect } from 'react';
+import { Form, Field } from 'react-final-form';
 
 const req = {
   get(url: string) {
@@ -15,19 +15,30 @@ const req = {
       body: JSON.stringify(body),
     }).then((response) => response.json());
   },
+
+  delete(url: string) {
+    return fetch(url, { method: 'DELETE' }).then((response) => response.json());
+  },
 };
 
-function useCampaigns() {
-  const [campaigns, setCampaigns] = useState([]);
+function useCampaigns(): [any[], () => void] {
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+
+  const load = async () => {
+    const { campaigns } = await req.get('/api/campaigns');
+
+    setCampaigns(campaigns);
+  };
+
   useEffect(() => {
-    req.get('/api/campaigns').then(({ campaigns }) => {
-      setCampaigns(campaigns);
-    });
+    load();
   }, []);
-  return [campaigns];
+
+  return [campaigns, load];
 }
+
 export default function Home() {
-  const [campaigns] = useCampaigns();
+  const [campaigns, reloadCampaigns] = useCampaigns();
 
   return (
     <div className={styles.container}>
@@ -43,18 +54,30 @@ export default function Home() {
 
         <p className={styles.description}>
           <AuthButtons />
-          <button
-            onClick={() => {
-              req
-                .post('/api/campaigns', {
-                  name: 'Example Campaign',
-                })
-                .then((data) => console.log(data));
-            }}
-          >
-            Create Campaign
-          </button>
         </p>
+        <Form
+          onSubmit={async (campaign) => {
+            await req.post('/api/campaigns', campaign);
+            reloadCampaigns();
+          }}
+        >
+          {({ handleSubmit }) => {
+            return (
+              <form className={styles.description} onSubmit={handleSubmit}>
+                <Field
+                  name='name'
+                  component='input'
+                  validate={(name) => {
+                    if (!name) {
+                      return 'Required';
+                    }
+                  }}
+                />
+                <button type='submit'>Create Campaign</button>
+              </form>
+            );
+          }}
+        </Form>
 
         <div className={styles.grid}>
           {campaigns.map(({ campaign, role }) => {
@@ -62,6 +85,14 @@ export default function Home() {
               <div className={styles.card} key={campaign.id}>
                 <h3>{campaign.name}</h3>
                 <div>Role: {role}</div>
+                <button
+                  onClick={async () => {
+                    await req.delete(`/api/campaigns/${campaign.id}`);
+                    reloadCampaigns();
+                  }}
+                >
+                  Delete
+                </button>
               </div>
             );
           })}
