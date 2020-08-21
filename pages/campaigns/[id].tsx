@@ -13,7 +13,6 @@ export default function CampaignView({ campaign }) {
 
 export const getServerSideProps: GetServerSideProps = async ({
   req,
-  res,
   params,
 }) => {
   const prisma = new PrismaClient();
