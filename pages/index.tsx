@@ -1,45 +1,11 @@
 import Head from 'next/head';
 import styles from '@app/styles/Home.module.css';
 import AuthButtons from '@app/components/auth-buttons';
-import { useState, useEffect } from 'react';
-import { Form, Field } from 'react-final-form';
-
-const req = {
-  get(url: string) {
-    return fetch(url).then((response) => response.json());
-  },
-
-  post(url: string, body: any) {
-    return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }).then((response) => response.json());
-  },
-
-  delete(url: string) {
-    return fetch(url, { method: 'DELETE' }).then((response) => response.json());
-  },
-};
-
-function useCampaigns(): [any[], () => void] {
-  const [campaigns, setCampaigns] = useState<any[]>([]);
-
-  const load = async () => {
-    const { campaigns } = await req.get('/api/campaigns');
-
-    setCampaigns(campaigns);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  return [campaigns, load];
-}
+import { useSession } from 'next-auth/client';
+import { CampaignList } from '@app/components/campaigns/campaign-list';
 
 export default function Home() {
-  const [campaigns, reloadCampaigns] = useCampaigns();
-
+  const [session] = useSession();
   return (
     <div className={styles.container}>
       <Head>
@@ -55,48 +21,7 @@ export default function Home() {
         <p className={styles.description}>
           <AuthButtons />
         </p>
-        <Form
-          onSubmit={async (campaign) => {
-            await req.post('/api/campaigns', campaign);
-            reloadCampaigns();
-          }}
-        >
-          {({ handleSubmit }) => {
-            return (
-              <form className={styles.description} onSubmit={handleSubmit}>
-                <Field
-                  name='name'
-                  component='input'
-                  validate={(name) => {
-                    if (!name) {
-                      return 'Required';
-                    }
-                  }}
-                />
-                <button type='submit'>Create Campaign</button>
-              </form>
-            );
-          }}
-        </Form>
-
-        <div className={styles.grid}>
-          {campaigns.map(({ campaign, role }) => {
-            return (
-              <div className={styles.card} key={campaign.id}>
-                <h3>{campaign.name}</h3>
-                <div>Role: {role}</div>
-                <button
-                  onClick={async () => {
-                    await req.delete(`/api/campaigns/${campaign.id}`);
-                    reloadCampaigns();
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        {session && <CampaignList />}
       </main>
 
       <footer className={styles.footer}>

@@ -4,8 +4,6 @@ import { signIn, signOut, useSession } from 'next-auth/client';
 export default function AuthButtons() {
   const [session, loading] = useSession();
 
-  console.log(session);
-
   return (
     <>
       {!session && (
