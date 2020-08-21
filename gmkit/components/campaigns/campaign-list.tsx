@@ -52,7 +52,9 @@ export function CampaignList() {
         {campaigns.map(({ campaign, role }) => {
           return (
             <div className={styles.card} key={campaign.id}>
-              <h3>{campaign.name}</h3>
+              <h3>
+                <a href={`/campaigns/${campaign.id}`}>{campaign.name}</a>
+              </h3>
               <div>Role: {role}</div>
               <button
                 onClick={async () => {

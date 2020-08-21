@@ -18,7 +18,7 @@ export default requireAuth(async (req, res) => {
       res.status(200);
       res.json(campaign);
     } else {
-      const campaigns = findCampaignsForUser(prisma, userId);
+      const campaigns = await findCampaignsForUser(prisma, userId);
       res.status(200);
       res.json({ campaigns });
     }
