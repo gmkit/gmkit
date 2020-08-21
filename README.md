@@ -42,7 +42,7 @@ Setup `prisma/.env`.
 
 **Updating the Database**
 
-````bash
+```bash
 npx prisma migrate --experimental up
 ```
 
@@ -50,7 +50,7 @@ npx prisma migrate --experimental up
 
 ```bash
 npx prisma generate
-````
+```
 
 ### Auth
 
