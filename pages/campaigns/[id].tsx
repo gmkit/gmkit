@@ -2,11 +2,18 @@ import { PrismaClient } from '@prisma/client';
 import { getSession } from 'next-auth/client';
 import { GetServerSideProps } from 'next';
 import { Layout } from '@app/components/layout';
+import { Editor } from '@app/components/editor';
 
 export default function CampaignView({ campaign }) {
   return (
     <Layout>
       <h1>{campaign.name}</h1>
+      <Editor
+        style={{
+          border: '1px solid black',
+          width: '100%',
+        }}
+      />
     </Layout>
   );
 }

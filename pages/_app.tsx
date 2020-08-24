@@ -1,4 +1,5 @@
 import '@app/styles/globals.css';
+import 'prosemirror-view/style/prosemirror.css';
 import { Provider as AuthProvider } from 'next-auth/client';
 
 function MyApp({ Component, pageProps }) {
