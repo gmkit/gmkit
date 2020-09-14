@@ -146,10 +146,6 @@ export default function EncounterView({ encounter }) {
                 <td>
                   <button
                     onClick={async () => {
-                      await req.delete(
-                        `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters/${character.id}`
-                      );
-
                       setCharacters((characters: EncounterCharacter[]) => {
                         const i = characters.findIndex(
                           ({ id }) => character.id === id
@@ -160,6 +156,17 @@ export default function EncounterView({ encounter }) {
                           ...characters.slice(i + 1),
                         ];
                       });
+
+                      try {
+                        await req.delete(
+                          `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters/${character.id}`
+                        );
+                      } catch {
+                        setCharacters((characters) => [
+                          ...characters,
+                          character,
+                        ]);
+                      }
                     }}
                   >
                     Remove
