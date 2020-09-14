@@ -1,17 +1,67 @@
-import { PrismaClient } from '@prisma/client';
-import { getSession } from 'next-auth/client';
+import { PrismaClient, EncounterCharacter } from '@prisma/client';
 import { GetServerSideProps } from 'next';
 import { Layout } from '@app/components/layout';
 import { serializeDates } from '@app/server/serialize-dates';
+import React, { useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { req } from '@app/req';
 
 export default function EncounterView({ encounter }) {
+  const [characters, setCharacters] = useState(encounter.characters);
   return (
     <Layout>
       <h1>{encounter.name}</h1>
+      <Form
+        onSubmit={async (data: EncounterCharacter) => {
+          const character = await req.post(
+            `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters`,
+            data
+          );
+          if (character.id) {
+            setCharacters((characters) => [...characters, character]);
+          }
+        }}
+      >
+        {({ handleSubmit, invalid }) => (
+          <>
+            <label>
+              Initiative Mod:
+              <Field
+                name='initiative'
+                component='input'
+                type='number'
+                validate={(val) => {
+                  if (val >= 0) return 'Must be larger than 0';
+                }}
+              />
+            </label>
+            <label>
+              Name
+              <Field
+                name='name'
+                component='input'
+                validate={(val) => {
+                  if (!val) return 'Required';
+                }}
+              />
+            </label>
+            <button onClick={handleSubmit} disabled={invalid}>
+              Add
+            </button>
+          </>
+        )}
+      </Form>
       <ul>
-        {encounter.characters.map((character) => (
-          <li>{character.name}</li>
-        ))}
+        {characters
+          .sort(
+            (a: EncounterCharacter, b: EncounterCharacter) =>
+              b.initiative - a.initiative
+          )
+          .map((character: EncounterCharacter) => (
+            <li>
+              {character.initiative}: {character.name}
+            </li>
+          ))}
       </ul>
     </Layout>
   );
@@ -21,27 +71,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   params,
 }) => {
-  const prisma = new PrismaClient();
-  const { accessToken } = await getSession({ req });
-  const { userId } = await prisma.session.findOne({
-    where: {
-      accessToken,
-    },
-  });
-  const campaignId = ~~params.campaignId;
-  const encounterId = ~~params.encounterId;
+  // TODO: Make sure user is logged in.
+  // TODO: Make sure user has access to the campaign
 
-  const { campaign } = await prisma.userInCampaign.findOne({
-    where: {
-      userId_campaignId: {
-        campaignId,
-        userId,
-      },
-    },
-    include: {
-      campaign: true,
-    },
-  });
+  const prisma = new PrismaClient();
+  const encounterId = ~~params.encounterId;
 
   const encounter = await prisma.encounter.findOne({
     where: {
