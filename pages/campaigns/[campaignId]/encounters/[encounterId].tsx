@@ -11,48 +11,121 @@ export default function EncounterView({ encounter }) {
   return (
     <Layout>
       <h1>{encounter.name}</h1>
-      <Form
-        onSubmit={async (data: EncounterCharacter) => {
-          const character = await req.post(
-            `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters`,
-            data
-          );
-          if (character.id) {
-            setCharacters((characters) => [...characters, character]);
-          }
-        }}
-      >
-        {({ handleSubmit, invalid }) => (
-          <>
-            <label>
-              Initiative:
-              <Field
-                name='initiative'
-                component='input'
-                type='number'
-                parse={(val) => val ?? 0}
-                defaultValue={0}
-                validate={(val) => {
-                  if (val < 0) return 'Must be larger than 0';
+      <div>
+        <h2>Add</h2>
+        <div style={{ display: 'flex' }}>
+          <Form
+            onSubmit={async (data: EncounterCharacter) => {
+              const character = await req.post(
+                `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters`,
+                data
+              );
+              if (character.id) {
+                setCharacters((characters) => [...characters, character]);
+              }
+            }}
+          >
+            {({ handleSubmit, invalid }) => (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginRight: '3rem',
                 }}
-              />
-            </label>
-            <label>
-              Name
-              <Field
-                name='name'
-                component='input'
-                validate={(val) => {
-                  if (!val) return 'Required';
-                }}
-              />
-            </label>
-            <button onClick={handleSubmit} disabled={invalid}>
-              Add
-            </button>
-          </>
-        )}
-      </Form>
+              >
+                <h3>Add Character</h3>
+                <label>
+                  Initiative:
+                  <Field
+                    name='initiative'
+                    component='input'
+                    type='number'
+                    parse={(val) => val ?? 0}
+                    defaultValue={0}
+                    validate={(val) => {
+                      if (val < 0) return 'Must be larger than 0';
+                    }}
+                  />
+                </label>
+                <label>
+                  Name
+                  <Field
+                    name='name'
+                    component='input'
+                    validate={(val) => {
+                      if (!val) return 'Required';
+                    }}
+                  />
+                </label>
+                <button onClick={handleSubmit} disabled={invalid}>
+                  Add Character
+                </button>
+              </div>
+            )}
+          </Form>
+          <Form
+            onSubmit={async ({ name, initMod, count }) => {
+              for (let i = 1; i <= count; i++) {
+                const character = await req.post(
+                  `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters`,
+                  {
+                    initiative: Roll.d20() + ~~initMod,
+                    name: `${name} ${i}`,
+                  }
+                );
+                if (character.id) {
+                  setCharacters((characters) => [...characters, character]);
+                }
+              }
+            }}
+          >
+            {({ handleSubmit, invalid }) => (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <h3>Add Enemies</h3>
+                <label>
+                  Count:
+                  <Field
+                    name='count'
+                    component='input'
+                    type='number'
+                    parse={(val) => ~~val ?? 1}
+                    defaultValue={1}
+                    validate={(count) => {
+                      if (count < 1) {
+                        return 'Must be greater than zero.';
+                      }
+                    }}
+                  />
+                </label>
+                <label>
+                  Init Mod:
+                  <Field
+                    name='initMod'
+                    component='input'
+                    type='number'
+                    parse={(val) => val ?? 0}
+                    defaultValue={0}
+                  />
+                </label>
+                <label>
+                  Name
+                  <Field
+                    name='name'
+                    component='input'
+                    validate={(val) => {
+                      if (!val) return 'Required';
+                    }}
+                  />
+                </label>
+                <button onClick={handleSubmit} disabled={invalid}>
+                  Add Enemies
+                </button>
+              </div>
+            )}
+          </Form>
+        </div>
+      </div>
+      <h2>Initiative Order</h2>
       <table>
         <thead>
           <tr>
@@ -127,3 +200,28 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   };
 };
+
+class Roll {
+  static d4() {
+    return Roll.d(4);
+  }
+  static d6() {
+    return Roll.d(6);
+  }
+
+  static d8() {
+    return Roll.d(8);
+  }
+  static d10() {
+    return Roll.d(10);
+  }
+  static d12() {
+    return Roll.d(12);
+  }
+  static d20() {
+    return Roll.d(20);
+  }
+  static d(sides: number): number {
+    return Math.floor(Math.random() * sides) + 1;
+  }
+}
