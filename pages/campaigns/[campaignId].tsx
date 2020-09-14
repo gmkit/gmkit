@@ -2,18 +2,25 @@ import { PrismaClient } from '@prisma/client';
 import { getSession } from 'next-auth/client';
 import { GetServerSideProps } from 'next';
 import { Layout } from '@app/components/layout';
-import { Editor } from '@app/components/editor';
+import Link from 'next/link';
+import { serializeDates } from '@app/server/serialize-dates';
 
 export default function CampaignView({ campaign }) {
   return (
     <Layout>
       <h1>{campaign.name}</h1>
-      <Editor
-        style={{
-          border: '1px solid black',
-          width: '100%',
-        }}
-      />
+      <ul>
+        {campaign.encounters.map((encounter) => (
+          <li>
+            <Link
+              as={`/campaigns/${campaign.id}/encounters/${encounter.id}`}
+              href='/campaigns/[campaignId]/encounters/[encounterId]'
+            >
+              <a>{encounter.name}</a>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </Layout>
   );
 }
@@ -29,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       accessToken,
     },
   });
-  const campaignId = ~~params.id;
+  const campaignId = ~~params.campaignId;
 
   const { campaign } = await prisma.userInCampaign.findOne({
     where: {
@@ -43,6 +50,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   });
 
+  const encounters = await prisma.encounter.findMany({
+    where: {
+      campaignId: campaign.id,
+    },
+  });
+
   prisma.$disconnect();
 
   return {
@@ -50,6 +63,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       campaign: {
         id: campaign.id,
         name: campaign.name,
+        encounters: serializeDates(encounters),
       },
     },
   };
