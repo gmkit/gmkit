@@ -9,7 +9,7 @@ import { req } from '@app/req';
 export default function EncounterView({ encounter }) {
   const [characters, setCharacters] = useState(encounter.characters);
   return (
-    <Layout>
+    <>
       <h1>{encounter.name}</h1>
       <div>
         <h2>Add</h2>
@@ -169,7 +169,7 @@ export default function EncounterView({ encounter }) {
             ))}
         </tbody>
       </table>
-    </Layout>
+    </>
   );
 }
 
