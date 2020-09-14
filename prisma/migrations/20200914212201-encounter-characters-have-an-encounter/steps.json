@@ -1,0 +1,65 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Encounter",
+      "field": "characters",
+      "type": "EncounterCharacter",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "EncounterCharacter",
+      "field": "encounter",
+      "type": "Encounter",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "EncounterCharacter",
+          "field": "encounter"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "EncounterCharacter",
+          "field": "encounter"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[encounterId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "EncounterCharacter",
+          "field": "encounter"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "EncounterCharacter",
+      "field": "encounterId",
+      "type": "Int",
+      "arity": "Required"
+    }
+  ]
+}
