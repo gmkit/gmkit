@@ -3,7 +3,7 @@ import { requireAuth } from '@app/server/require-auth';
 
 export default requireAuth(async (req, res) => {
   const prisma = new PrismaClient();
-  const id = ~~(req.query.id as string);
+  const id = ~~(req.query.campaignId as string);
   try {
     await deleteCampaign(prisma, id);
     res.status(200);
