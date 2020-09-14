@@ -9,16 +9,9 @@ export default function EncounterView({ encounter }) {
     <Layout>
       <h1>{encounter.name}</h1>
       <ul>
-        {/* {campaign.encounters.map((encounter) => (
-          <li>
-            <Link
-              as={`/campaigns/${campaign.id}/encounters/${encounter.id}`}
-              href='/campaigns/[campaignId]/encounters/[encounterId]'
-            >
-              <a>{encounter.name}</a>
-            </Link>
-          </li>
-        ))} */}
+        {encounter.characters.map((character) => (
+          <li>{character.name}</li>
+        ))}
       </ul>
     </Layout>
   );
@@ -53,6 +46,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   const encounter = await prisma.encounter.findOne({
     where: {
       id: encounterId,
+    },
+    include: {
+      characters: true,
     },
   });
 
