@@ -1,6 +1,5 @@
 import { PrismaClient, EncounterCharacter } from '@prisma/client';
 import { GetServerSideProps } from 'next';
-import { Layout } from '@app/components/layout';
 import { serializeDates } from '@app/server/serialize-dates';
 import React, { useState } from 'react';
 import { Field, Form } from 'react-final-form';
@@ -8,6 +7,16 @@ import { req } from '@app/req';
 
 export default function EncounterView({ encounter }) {
   const [characters, setCharacters] = useState(encounter.characters);
+  const sortedCharacters = characters.sort(
+    (a: EncounterCharacter, b: EncounterCharacter) =>
+      b.initiative - a.initiative
+  );
+
+  const encounterHasStarted = encounter.activeCharacterId;
+  const activeCharacter = sortedCharacters.find(
+    ({ id }) => encounter.activeCharacterId === id
+  );
+
   return (
     <>
       <h1>{encounter.name}</h1>
@@ -126,6 +135,9 @@ export default function EncounterView({ encounter }) {
         </div>
       </div>
       <h2>Initiative Order</h2>
+      <button onClick={() => {}}>
+        {encounter.characterId ? 'Next Turn' : 'Begin'}
+      </button>
       <table>
         <thead>
           <tr>
@@ -135,45 +147,37 @@ export default function EncounterView({ encounter }) {
           </tr>
         </thead>
         <tbody>
-          {characters
-            .sort(
-              (a: EncounterCharacter, b: EncounterCharacter) =>
-                b.initiative - a.initiative
-            )
-            .map((character: EncounterCharacter) => (
-              <tr>
-                <td>{character.initiative}</td> <td>{character.name}</td>
-                <td>
-                  <button
-                    onClick={async () => {
-                      setCharacters((characters: EncounterCharacter[]) => {
-                        const i = characters.findIndex(
-                          ({ id }) => character.id === id
-                        );
+          {sortedCharacters.map((character: EncounterCharacter) => (
+            <tr>
+              <td>{character.initiative}</td> <td>{character.name}</td>
+              <td>
+                <button
+                  onClick={async () => {
+                    setCharacters((characters: EncounterCharacter[]) => {
+                      const i = characters.findIndex(
+                        ({ id }) => character.id === id
+                      );
 
-                        return [
-                          ...characters.slice(0, i),
-                          ...characters.slice(i + 1),
-                        ];
-                      });
+                      return [
+                        ...characters.slice(0, i),
+                        ...characters.slice(i + 1),
+                      ];
+                    });
 
-                      try {
-                        await req.delete(
-                          `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters/${character.id}`
-                        );
-                      } catch {
-                        setCharacters((characters) => [
-                          ...characters,
-                          character,
-                        ]);
-                      }
-                    }}
-                  >
-                    Remove
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    try {
+                      await req.delete(
+                        `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters/${character.id}`
+                      );
+                    } catch {
+                      setCharacters((characters) => [...characters, character]);
+                    }
+                  }}
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </>
