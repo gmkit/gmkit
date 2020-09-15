@@ -1,21 +1,14 @@
-import { PrismaClient, EncounterCharacter } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { GetServerSideProps } from 'next';
 import { serializeDates } from '@app/server/serialize-dates';
-import React, { useState } from 'react';
-import { Field, Form } from 'react-final-form';
-import { req } from '@app/req';
+import React from 'react';
+import { AddCharacterForm } from '@app/components/encounters/add-character-form';
+import { AddMultipleEnemiesForm } from '@app/components/encounters/add-multiple-enemies-form';
+import { InitiativeOrderTable } from '@app/components/encounters/initiative-order-table';
+import { useCharacterList } from '@app/hooks/use-characters-list';
 
 export default function EncounterView({ encounter }) {
-  const [characters, setCharacters] = useState(encounter.characters);
-  const sortedCharacters = characters.sort(
-    (a: EncounterCharacter, b: EncounterCharacter) =>
-      b.initiative - a.initiative
-  );
-
-  const encounterHasStarted = encounter.activeCharacterId;
-  const activeCharacter = sortedCharacters.find(
-    ({ id }) => encounter.activeCharacterId === id
-  );
+  const characters = useCharacterList(encounter);
 
   return (
     <>
@@ -23,163 +16,15 @@ export default function EncounterView({ encounter }) {
       <div>
         <h2>Add</h2>
         <div style={{ display: 'flex' }}>
-          <Form
-            onSubmit={async (data: EncounterCharacter) => {
-              const character = await req.post(
-                `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters`,
-                data
-              );
-              if (character.id) {
-                setCharacters((characters) => [...characters, character]);
-              }
-            }}
-          >
-            {({ handleSubmit, invalid }) => (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  marginRight: '3rem',
-                }}
-              >
-                <h3>Add Character</h3>
-                <label>
-                  Initiative:
-                  <Field
-                    name='initiative'
-                    component='input'
-                    type='number'
-                    parse={(val) => val ?? 0}
-                    defaultValue={0}
-                    validate={(val) => {
-                      if (val < 0) return 'Must be larger than 0';
-                    }}
-                  />
-                </label>
-                <label>
-                  Name
-                  <Field
-                    name='name'
-                    component='input'
-                    validate={(val) => {
-                      if (!val) return 'Required';
-                    }}
-                  />
-                </label>
-                <button onClick={handleSubmit} disabled={invalid}>
-                  Add Character
-                </button>
-              </div>
-            )}
-          </Form>
-          <Form
-            onSubmit={async ({ name, initMod, count }) => {
-              for (let i = 1; i <= count; i++) {
-                const character = await req.post(
-                  `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters`,
-                  {
-                    initiative: Roll.d20() + ~~initMod,
-                    name: `${name} ${i}`,
-                  }
-                );
-                if (character.id) {
-                  setCharacters((characters) => [...characters, character]);
-                }
-              }
-            }}
-          >
-            {({ handleSubmit, invalid }) => (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <h3>Add Enemies</h3>
-                <label>
-                  Count:
-                  <Field
-                    name='count'
-                    component='input'
-                    type='number'
-                    parse={(val) => ~~val ?? 1}
-                    defaultValue={1}
-                    validate={(count) => {
-                      if (count < 1) {
-                        return 'Must be greater than zero.';
-                      }
-                    }}
-                  />
-                </label>
-                <label>
-                  Init Mod:
-                  <Field
-                    name='initMod'
-                    component='input'
-                    type='number'
-                    parse={(val) => val ?? 0}
-                    defaultValue={0}
-                  />
-                </label>
-                <label>
-                  Name
-                  <Field
-                    name='name'
-                    component='input'
-                    validate={(val) => {
-                      if (!val) return 'Required';
-                    }}
-                  />
-                </label>
-                <button onClick={handleSubmit} disabled={invalid}>
-                  Add Enemies
-                </button>
-              </div>
-            )}
-          </Form>
+          <AddCharacterForm createCharacter={characters.create} />
+          <AddMultipleEnemiesForm createCharacter={characters.create} />
         </div>
+        <InitiativeOrderTable
+          encounter={encounter}
+          characters={characters.list}
+          removeCharacter={characters.remove}
+        />
       </div>
-      <h2>Initiative Order</h2>
-      <button onClick={() => {}}>
-        {encounter.characterId ? 'Next Turn' : 'Begin'}
-      </button>
-      <table>
-        <thead>
-          <tr>
-            <th>Init</th>
-            <th>Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedCharacters.map((character: EncounterCharacter) => (
-            <tr>
-              <td>{character.initiative}</td> <td>{character.name}</td>
-              <td>
-                <button
-                  onClick={async () => {
-                    setCharacters((characters: EncounterCharacter[]) => {
-                      const i = characters.findIndex(
-                        ({ id }) => character.id === id
-                      );
-
-                      return [
-                        ...characters.slice(0, i),
-                        ...characters.slice(i + 1),
-                      ];
-                    });
-
-                    try {
-                      await req.delete(
-                        `/api/campaigns/${encounter.campaignId}/encounters/${encounter.id}/characters/${character.id}`
-                      );
-                    } catch {
-                      setCharacters((characters) => [...characters, character]);
-                    }
-                  }}
-                >
-                  Remove
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </>
   );
 }
@@ -211,28 +56,3 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   };
 };
-
-class Roll {
-  static d4() {
-    return Roll.d(4);
-  }
-  static d6() {
-    return Roll.d(6);
-  }
-
-  static d8() {
-    return Roll.d(8);
-  }
-  static d10() {
-    return Roll.d(10);
-  }
-  static d12() {
-    return Roll.d(12);
-  }
-  static d20() {
-    return Roll.d(20);
-  }
-  static d(sides: number): number {
-    return Math.floor(Math.random() * sides) + 1;
-  }
-}
