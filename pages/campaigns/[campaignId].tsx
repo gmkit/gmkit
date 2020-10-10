@@ -1,16 +1,48 @@
+import { req } from '@app/req';
+import { Form, Field } from 'react-final-form';
 import { PrismaClient } from '@prisma/client';
 import { getSession } from 'next-auth/client';
 import { GetServerSideProps } from 'next';
 import { Layout } from '@app/components/layout';
 import Link from 'next/link';
 import { serializeDates } from '@app/server/serialize-dates';
+import styles from '@app/styles/Home.module.css';
+import { useState } from 'react';
 
 export default function CampaignView({ campaign }) {
+  const [encounters, setEncounters] = useState(campaign.encounters);
+
   return (
     <Layout>
       <h1>{campaign.name}</h1>
+      <Form
+        onSubmit={async (encounter) => {
+          await req.post(`/api/campaigns/${campaign.id}/encounters`, encounter);
+          const { encounters } = await req.get(
+            `/api/campaigns/${campaign.id}/encounters`
+          );
+          setEncounters(encounters);
+        }}
+      >
+        {({ handleSubmit }) => {
+          return (
+            <form className={styles.description} onSubmit={handleSubmit}>
+              <Field
+                name='name'
+                component='input'
+                validate={(name) => {
+                  if (!name) {
+                    return 'Required';
+                  }
+                }}
+              />
+              <button type='submit'>Create Encounter</button>
+            </form>
+          );
+        }}
+      </Form>
       <ul>
-        {campaign.encounters.map((encounter) => (
+        {encounters.map((encounter) => (
           <li>
             <Link
               as={`/campaigns/${campaign.id}/encounters/${encounter.id}`}
