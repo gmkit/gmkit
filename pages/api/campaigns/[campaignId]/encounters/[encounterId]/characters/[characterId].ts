@@ -1,18 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { requireAuth } from '@app/server/require-auth';
+import { handler } from '@app/server/handler';
 
-export default requireAuth(async (req, res) => {
-  const prisma = new PrismaClient();
+export default handler(async (req, res, { prisma }) => {
   const characterId = ~~(req.query.characterId as string);
-  try {
-    await deleteCharacter(prisma, characterId);
-    res.status(200);
-    res.json({ message: `Campaign Deleted`, id: characterId });
-  } catch (error) {
-    res.status(500);
-    res.json({ error: error.message });
-  }
-  prisma.$disconnect();
+
+  await deleteCharacter(prisma, characterId);
+
+  res.json({ id: characterId });
 });
 
 /**

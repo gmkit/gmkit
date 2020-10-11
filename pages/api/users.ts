@@ -1,21 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import { requireAuth } from '@app/server/require-auth';
+import { handler } from '@app/server/handler';
 
-export default requireAuth((req, res) => {
-  const prisma = new PrismaClient();
-  listUsers(prisma)
-    .then((users) => {
-      res.statusCode = 200;
-      res.json({ message: 'Ya basic!', users });
-    })
-    .catch((e) => {
-      console.error(e);
-      res.statusCode = 500;
-      res.json({ message: 'Uh oh' });
-    })
-    .finally(() => {
-      prisma.$disconnect();
-    });
+export default handler(async (req, res, { prisma }) => {
+  const users = await listUsers(prisma);
+
+  res.json({ users });
 });
 
 async function listUsers(prisma: PrismaClient) {

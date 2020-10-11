@@ -1,41 +1,27 @@
-import {
-  EncounterCharacterArgs,
-  EncounterCharacterCreateArgs,
-  PrismaClient,
-} from '@prisma/client';
-import { requireAuth } from '@app/server/require-auth';
+import { EncounterCharacterCreateArgs, PrismaClient } from '@prisma/client';
 import { serializeDates } from '@app/server/serialize-dates';
+import { handler } from '@app/server/handler';
 
-export default requireAuth(async (req, res) => {
-  const prisma = new PrismaClient();
-
+export default handler(async (req, res, { prisma }) => {
   // TODO: Check user authentication
   // TODO: Check campaign existence and access
   // TODO: Check encounter existence and access
-  try {
-    if (req.method === 'POST') {
-      const { name, initiative = 0, ...test } = JSON.parse(req.body);
-      console.log({ name, initiative, ...test });
-      const character = await createCharacter(prisma, {
-        encounter: {
-          connect: {
-            id: ~~(req.query.encounterId as string),
-          },
+  if (req.method === 'POST') {
+    const { name, initiative = 0 } = JSON.parse(req.body);
+    const character = await createCharacter(prisma, {
+      encounter: {
+        connect: {
+          id: ~~(req.query.encounterId as string),
         },
-        name,
-        initiative: ~~initiative,
-      });
-      res.status(200);
-      res.json(serializeDates(character));
-    } else {
-      res.status(404);
-    }
-  } catch (error) {
-    res.status(500);
-    console.log(error);
-    res.json({ ...error });
+      },
+      name,
+      initiative: ~~initiative,
+    });
+    res.status(200);
+    res.json(serializeDates(character));
+  } else {
+    res.status(404);
   }
-  prisma.$disconnect();
 });
 
 async function createCharacter(
