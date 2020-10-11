@@ -1,33 +1,26 @@
-import { PrismaClient } from '@prisma/client';
-import { getSession } from 'next-auth/client';
-import { requireAuth } from '@app/server/require-auth';
+import { PrismaClient, Session } from '@prisma/client';
+import { handler } from '@app/server/handler';
 
-export default requireAuth(async (req, res) => {
-  const prisma = new PrismaClient();
-  const { accessToken } = await getSession({ req });
-  const { userId } = await prisma.session.findOne({
+export default handler(async (req, res, { prisma, session }) => {
+  const { userId } = await getUserForSession(prisma, session);
+
+  if (req.method === 'POST') {
+    const { name } = JSON.parse(req.body);
+    const campaign = await createCampaign(prisma, userId, name);
+    res.status(200).json(campaign);
+  } else {
+    const campaigns = await findCampaignsForUser(prisma, userId);
+    res.status(200).json({ campaigns });
+  }
+});
+
+function getUserForSession(prisma: PrismaClient, { accessToken }: Session) {
+  return prisma.session.findOne({
     where: {
       accessToken,
     },
   });
-
-  try {
-    if (req.method === 'POST') {
-      const { name } = JSON.parse(req.body);
-      const campaign = await createCampaign(prisma, userId, name);
-      res.status(200);
-      res.json(campaign);
-    } else {
-      const campaigns = await findCampaignsForUser(prisma, userId);
-      res.status(200);
-      res.json({ campaigns });
-    }
-  } catch (error) {
-    res.status(500);
-    res.json({ error });
-  }
-  prisma.$disconnect();
-});
+}
 
 async function createCampaign(
   prisma: PrismaClient,
