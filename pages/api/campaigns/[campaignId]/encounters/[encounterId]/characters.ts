@@ -1,5 +1,4 @@
 import { EncounterCharacterCreateArgs, PrismaClient } from '@prisma/client';
-import { serializeDates } from '@app/server/serialize-dates';
 import { handler } from '@app/server/handler';
 
 export default handler(async (req, res, { prisma }) => {
@@ -17,7 +16,7 @@ export default handler(async (req, res, { prisma }) => {
       name,
       initiative: ~~initiative,
     });
-    return serializeDates(character)
+    return character
   } else {
     res.status(404);
   }

@@ -1,6 +1,7 @@
 import { PrismaClient, Session } from '@prisma/client';
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/client';
+import { serializeDates } from './serialize-dates';
 
 interface Context {
   prisma: PrismaClient;
@@ -19,7 +20,7 @@ export function handler(cb: Handler): NextApiHandler {
     try {
       const session = await authenticate(req);
       const responseData = await cb(req, res, { prisma, session });
-      res.status(200).json(responseData)
+      res.status(200).json(serializeDates(responseData))
     } catch (error) {
       await handleError(req, res, error);
     } finally {
