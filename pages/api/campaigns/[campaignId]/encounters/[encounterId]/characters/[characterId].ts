@@ -6,7 +6,7 @@ export default handler(async (req, res, { prisma }) => {
 
   await deleteCharacter(prisma, characterId);
 
-  res.json({ id: characterId });
+  return { id: characterId }
 });
 
 /**

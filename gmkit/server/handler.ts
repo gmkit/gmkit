@@ -11,14 +11,15 @@ type Handler = (
   req: NextApiRequest,
   res: NextApiResponse,
   ctx: Context
-) => void | Promise<void>;
+) => object | Promise<object>;
 
 export function handler(cb: Handler): NextApiHandler {
   return async (req, res) => {
     const prisma = new PrismaClient();
     try {
       const session = await authenticate(req);
-      await cb(req, res, { prisma, session });
+      const responseData = await cb(req, res, { prisma, session });
+      res.status(200).json(responseData)
     } catch (error) {
       await handleError(req, res, error);
     } finally {

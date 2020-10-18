@@ -7,10 +7,10 @@ export default handler(async (req, res, { prisma }) => {
   if (req.method === 'POST') {
     const { name } = JSON.parse(req.body);
     const campaign = await createEncounter(prisma, campaignId, name);
-    res.json(campaign);
+    return campaign
   } else {
     const encounters = await findCampaignEncounters(prisma, campaignId);
-    res.json({ encounters });
+    return { encounters }
   }
 });
 

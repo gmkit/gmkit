@@ -17,8 +17,7 @@ export default handler(async (req, res, { prisma }) => {
       name,
       initiative: ~~initiative,
     });
-    res.status(200);
-    res.json(serializeDates(character));
+    return serializeDates(character)
   } else {
     res.status(404);
   }

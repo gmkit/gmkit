@@ -4,7 +4,7 @@ import { handler } from '@app/server/handler';
 export default handler(async (req, res, { prisma }) => {
   const id = ~~(req.query.campaignId as string);
   await deleteCampaign(prisma, id);
-  res.json({ message: `Campaign Deleted`, id });
+  return { message: `Campaign Deleted`, id }
 });
 
 /**
