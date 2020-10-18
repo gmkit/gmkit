@@ -1,4 +1,3 @@
-import { PrismaClient, Session } from '@prisma/client';
 import { handler } from '@app/server/handler';
 
 export default handler(async (req, res, { prisma, session }) => {
@@ -6,49 +5,40 @@ export default handler(async (req, res, { prisma, session }) => {
 
   if (req.method === 'POST') {
     const { name } = JSON.parse(req.body);
-    const campaign = await createCampaign(prisma, userId, name);
-    return campaign
+
+    return prisma.campaign.create(campaignWithGM(name, userId));
   } else {
-    const campaigns = await findCampaignsForUser(prisma, userId);
+    const campaigns = await prisma.userInCampaign.findMany(campaignsForUser(userId))
+
     return { campaigns }
   }
 });
 
-async function createCampaign(
-  prisma: PrismaClient,
-  userId: number,
-  name: string
-) {
-  const campaign = await prisma.campaign.create({
+function campaignWithGM(campaignName: string, gmId: number) {
+  return {
     data: {
-      name,
+      name: campaignName,
       users: {
         create: {
-          role: 'GM',
+          role: 'GM' as 'GM',
           user: {
             connect: {
-              id: userId,
+              id: gmId,
             },
           },
         },
       },
     },
-  });
-  return campaign;
+  }
 }
 
-async function findCampaignsForUser(prisma: PrismaClient, userId: number) {
-  const { campaigns } = await prisma.user.findOne({
+function campaignsForUser(userId: number) {
+  return {
     where: {
-      id: userId,
+      userId,
     },
     include: {
-      campaigns: {
-        include: {
-          campaign: true,
-        },
-      },
+      campaign: true,
     },
-  });
-  return campaigns;
+  }
 }
