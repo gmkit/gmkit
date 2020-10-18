@@ -1,0 +1,6 @@
+#!/bin/bash   
+export DATABASE_URL="file:./test.db"
+touch prisma/test.db
+npx prisma migrate --experimental up 
+npx jest --testPathPattern "tests/prisma"
+rm -rf prisma/test.db
