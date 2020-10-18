@@ -2,7 +2,7 @@ import { PrismaClient, Session } from '@prisma/client';
 import { handler } from '@app/server/handler';
 
 export default handler(async (req, res, { prisma, session }) => {
-  const { userId } = await getUserForSession(prisma, session);
+  const { userId } = session
 
   if (req.method === 'POST') {
     const { name } = JSON.parse(req.body);
@@ -13,14 +13,6 @@ export default handler(async (req, res, { prisma, session }) => {
     return { campaigns }
   }
 });
-
-function getUserForSession(prisma: PrismaClient, { accessToken }: Session) {
-  return prisma.session.findOne({
-    where: {
-      accessToken,
-    },
-  });
-}
 
 async function createCampaign(
   prisma: PrismaClient,
