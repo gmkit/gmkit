@@ -18,7 +18,6 @@ export function handler(cb: Handler): NextApiHandler {
     const prisma = new PrismaClient();
     try {
       const session = await authenticate(req);
-      console.log(session);
       await cb(req, res, { prisma, session });
     } catch (error) {
       await handleError(req, res, error);
