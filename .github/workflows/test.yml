@@ -15,5 +15,14 @@ jobs:
       - name: Install
         run: yarn
 
-      - name: Test
-        run: yarn test
+      - name: Create Test DB
+        run: touch prisma/test.db
+      
+      - name: Migrate Test DB
+        run: npx prisma migrate --experimental up
+
+      - name: Integration Tests
+        run: yarn test:db
+
+      - name: Unit Tests
+        run: yarn test:unit
