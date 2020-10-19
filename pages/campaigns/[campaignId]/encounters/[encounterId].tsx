@@ -6,12 +6,13 @@ import { AddCharacterForm } from '@app/components/encounters/add-character-form'
 import { AddMultipleEnemiesForm } from '@app/components/encounters/add-multiple-enemies-form';
 import { InitiativeOrderTable } from '@app/components/encounters/initiative-order-table';
 import { useCharacterList } from '@app/hooks/use-characters-list';
+import { Layout } from '@app/components/layout';
 
 export default function EncounterView({ encounter }) {
   const characters = useCharacterList(encounter);
 
   return (
-    <>
+    <Layout>
       <h1>{encounter.name}</h1>
       <div>
         <h2>Add</h2>
@@ -25,7 +26,7 @@ export default function EncounterView({ encounter }) {
           removeCharacter={characters.remove}
         />
       </div>
-    </>
+    </Layout>
   );
 }
 
