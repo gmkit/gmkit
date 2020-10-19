@@ -1,11 +1,3 @@
 # Prisma Migrate lockfile v1
 
-20200819221033-update-user-model
-20200819222123-add-auth-models
-20200819222308-user-email-is-optional
-20200821151426-add-campaign-table
-20200914204317-add-encounter-model
-20200914212201-encounter-characters-have-an-encounter
-20200914212430-rename-encounter-character-table
-20200915204852-encounter-has-active-character
-20201018231823-allow-for-sqlite
+20201019182734-initialize-db

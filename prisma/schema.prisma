@@ -80,7 +80,7 @@ model UserInCampaign {
   campaign   Campaign @relation(fields: [campaignId], references: [id])
   campaignId Int
   createdAt  DateTime @default(now())
-  role       String
+  role       String   @default("GM")
 
   @@id([userId, campaignId])
   @@map(name: "users_in_campaign")
