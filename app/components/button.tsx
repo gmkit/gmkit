@@ -16,6 +16,8 @@ export const Button = styled.button`
 	text-decoration:none;
 	text-shadow:0px 1px 0px #ffffff;
 
+  width: fit-content;
+
   &:hover {
     background:linear-gradient(to bottom, #dfdfdf 5%, #ededed 100%);
     background-color:#dfdfdf;
