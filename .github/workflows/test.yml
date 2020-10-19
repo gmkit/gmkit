@@ -25,7 +25,7 @@ jobs:
         run: npx prisma migrate --experimental up
 
       - name: Integration Tests
-        run: yarn test:db
+        run: npx jest --testPathPattern "tests/prisma"
 
       - name: Unit Tests
         run: yarn test:unit
