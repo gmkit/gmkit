@@ -1,69 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-import { getSession } from 'next-auth/client';
-import { requireAuth } from '@app/server/require-auth';
+import { findCampaignsForUser, createCampaignWithGM } from '@app/prisma';
+import { handler } from '@app/server/handler';
 
-export default requireAuth(async (req, res) => {
-  const prisma = new PrismaClient();
-  const { accessToken } = await getSession({ req });
-  const { userId } = await prisma.session.findOne({
-    where: {
-      accessToken,
-    },
-  });
+export default handler(async (req, res, { prisma, session }) => {
+  const { userId } = session
 
-  try {
-    if (req.method === 'POST') {
-      const { name } = JSON.parse(req.body);
-      const campaign = await createCampaign(prisma, userId, name);
-      res.status(200);
-      res.json(campaign);
-    } else {
-      const campaigns = await findCampaignsForUser(prisma, userId);
-      res.status(200);
-      res.json({ campaigns });
-    }
-  } catch (error) {
-    res.status(500);
-    res.json({ error });
+  if (req.method === 'POST') {
+    const { name } = JSON.parse(req.body);
+
+    return prisma.campaign.create(createCampaignWithGM(name, userId));
+  } else {
+    const campaigns = await prisma.userInCampaign.findMany(findCampaignsForUser(userId))
+
+    return { campaigns }
   }
-  prisma.$disconnect();
 });
-
-async function createCampaign(
-  prisma: PrismaClient,
-  userId: number,
-  name: string
-) {
-  const campaign = await prisma.campaign.create({
-    data: {
-      name,
-      users: {
-        create: {
-          role: 'GM',
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-        },
-      },
-    },
-  });
-  return campaign;
-}
-
-async function findCampaignsForUser(prisma: PrismaClient, userId: number) {
-  const { campaigns } = await prisma.user.findOne({
-    where: {
-      id: userId,
-    },
-    include: {
-      campaigns: {
-        include: {
-          campaign: true,
-        },
-      },
-    },
-  });
-  return campaigns;
-}

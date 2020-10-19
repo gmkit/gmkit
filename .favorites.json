@@ -1,0 +1,18 @@
+[
+    {
+        "type": "Directory",
+        "name": "/Users/ncphi/Code/ncphillips/gmkit/pages/api",
+        "parent_id": null,
+        "workspaceRoot": "/Users/ncphi/Code/ncphillips/gmkit",
+        "workspacePath": "pages/api",
+        "id": "hsdYBrwg3z9IMDbn"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/ncphi/Code/ncphillips/gmkit/tests",
+        "parent_id": null,
+        "workspaceRoot": "/Users/ncphi/Code/ncphillips/gmkit",
+        "workspacePath": "tests",
+        "id": "O4gJNaz1qDLctmWA"
+    }
+]
