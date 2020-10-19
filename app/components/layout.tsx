@@ -1,22 +1,43 @@
 import Head from 'next/head';
-import styles from '@app/styles/Home.module.css';
 import AuthButtons from '@app/components/auth-buttons';
+import styled from 'styled-components';
+import Link from 'next/link';
 
 export function Layout({ children }) {
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>GMKit</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className={styles.main}>
-        <h1>Welcome to GMKit</h1>
-        <p className={styles.description}>
-          <AuthButtons />
-        </p>
+      <Nav>
+        <NavTitle>
+          <Link href="/">
+            gmkit
+          </Link>
+        </NavTitle>
+
+        <AuthButtons />
+      </Nav>
+      <Main>
         {children}
-      </main>
-    </div>
+      </Main>
+    </>
   );
 }
+
+const Main = styled.main`
+  margin: 0 2.5rem;
+`
+
+const Nav = styled.nav`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0 2.5rem;
+`
+
+const NavTitle = styled.h1`
+  flex-grow: 1;
+`
