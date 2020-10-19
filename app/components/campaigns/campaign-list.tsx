@@ -1,15 +1,21 @@
-import { Form, Field } from 'react-final-form';
-import { useEffect, useState } from 'react';
-import { req } from '@app/req';
-import styles from '@app/styles/Home.module.css';
+import { Form, Field } from "react-final-form";
+import React, { useEffect, useState } from "react";
+import { req } from "@app/req";
+import styles from "@app/styles/Home.module.css";
+import { Button } from "../button";
+import { Input } from "../input";
 
 function useCampaigns(): [any[], () => void] {
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
   const load = async () => {
-    const { campaigns } = await req.get('/api/campaigns');
+    const { campaigns } = await req.get("/api/campaigns");
 
-    setCampaigns(campaigns);
+    if (!campaigns) {
+      console.error("No campaigns");
+    } else {
+      setCampaigns(campaigns);
+    }
   };
 
   useEffect(() => {
@@ -24,25 +30,33 @@ export function CampaignList() {
 
   return (
     <>
+      <h2>Campaigns</h2>
       <Form
         onSubmit={async (campaign) => {
-          await req.post('/api/campaigns', campaign);
+          await req.post("/api/campaigns", campaign);
           reloadCampaigns();
         }}
       >
         {({ handleSubmit }) => {
           return (
-            <form className={styles.description} onSubmit={handleSubmit}>
-              <Field
-                name='name'
-                component='input'
-                validate={(name) => {
-                  if (!name) {
-                    return 'Required';
-                  }
-                }}
-              />
-              <button type='submit'>Create Campaign</button>
+            <form
+              style={{ display: "flex", flexDirection: "column" }}
+              onSubmit={handleSubmit}
+            >
+              <label htmlFor="name" style={{ padding: "0.5rem" }}>
+                Campaign Name
+                <Field
+                  id="name"
+                  name="name"
+                  component={Input}
+                  validate={(name) => {
+                    if (!name) {
+                      return "Required";
+                    }
+                  }}
+                />
+              </label>
+              <Button type="submit">Create Campaign</Button>
             </form>
           );
         }}
