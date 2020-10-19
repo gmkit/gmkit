@@ -11,6 +11,7 @@ jobs:
 
     env: 
       DATABASE_URL: "file:./test.db"
+      DEBUG: "*"
 
     steps:
       - uses: actions/checkout@v2
