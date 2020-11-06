@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { req } from "@app/req";
 import styles from "@app/styles/Home.module.css";
 import { Button } from "../button";
-import { Input } from "../input";
+import { InputField } from "../fields/input";
 
 function useCampaigns(): [any[], () => void] {
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -37,7 +37,7 @@ export function CampaignList() {
           reloadCampaigns();
         }}
       >
-        {({ handleSubmit }) => {
+        {({ handleSubmit, errors }) => {
           return (
             <form
               style={{ display: "flex", flexDirection: "column" }}
@@ -48,8 +48,9 @@ export function CampaignList() {
                 <Field
                   id="name"
                   name="name"
-                  component={Input}
+                  component={InputField}
                   validate={(name) => {
+                    console.log({ name });
                     if (!name) {
                       return "Required";
                     }

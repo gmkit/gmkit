@@ -1,11 +1,11 @@
-import { EncounterCharacterCreateArgs, PrismaClient } from '@prisma/client';
-import { handler } from '@app/server/handler';
+import { EncounterCharacterCreateArgs, PrismaClient } from "@prisma/client";
+import { handler, NotImplementedError } from "@app/server/handler";
 
-export default handler(async (req, res, { prisma }) => {
+export default handler(async ({ req, prisma }) => {
   // TODO: Check user authentication
   // TODO: Check campaign existence and access
   // TODO: Check encounter existence and access
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     const { name, initiative = 0 } = JSON.parse(req.body);
     const character = await createCharacter(prisma, {
       encounter: {
@@ -16,15 +16,15 @@ export default handler(async (req, res, { prisma }) => {
       name,
       initiative: ~~initiative,
     });
-    return character
+    return character;
   } else {
-    res.status(404);
+    throw new NotImplementedError();
   }
 });
 
 async function createCharacter(
   prisma: PrismaClient,
-  data: EncounterCharacterCreateArgs['data']
+  data: EncounterCharacterCreateArgs["data"]
 ) {
   const campaign = await prisma.encounterCharacter.create({
     data,
