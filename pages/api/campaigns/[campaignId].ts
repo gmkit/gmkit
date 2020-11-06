@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { handler } from '@app/server/handler';
 
-export default handler(async (req, { prisma }) => {
+export default handler(async ({ req, prisma }) => {
   const id = ~~(req.query.campaignId as string);
   await deleteCampaign(prisma, id);
   return { message: `Campaign Deleted`, id }

@@ -1,7 +1,7 @@
 import { findCampaignsForUser, createCampaignWithGM } from '@app/prisma';
 import { handler } from '@app/server/handler';
 
-export default handler(async (req, { prisma, userId }) => {
+export default handler(async ({req, prisma, userId }) => {
   if (req.method === 'POST') {
     const { name } = JSON.parse(req.body);
 

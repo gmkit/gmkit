@@ -4,14 +4,12 @@ import { getSession } from 'next-auth/client';
 import { serializeDates } from './serialize-dates';
 
 interface Context {
+  req: NextApiRequest
   prisma: PrismaClient;
   userId: number;
 }
 
-type Handler = (
-  req: NextApiRequest,
-  ctx: Context
-) => object | Promise<object>;
+type Handler = (ctx: Context) => object | Promise<object>;
 
 export function handler(cb: Handler): NextApiHandler {
   return async (req, res) => {
@@ -19,7 +17,7 @@ export function handler(cb: Handler): NextApiHandler {
     try {
       const session = await authenticate(req);
       const { userId} = await prisma.session.findOne({ where: { accessToken: session.accessToken }})
-      const responseData = await cb(req, { prisma, userId });
+      const responseData = await cb({ req, prisma, userId });
       console.log({ session })
       res.status(200).json(serializeDates(responseData))
     } catch (error) {
