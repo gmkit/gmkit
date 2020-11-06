@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { handler } from '@app/server/handler';
 
-export default handler(async (req, res, { prisma }) => {
+export default handler(async (req, { prisma }) => {
   const characterId = ~~(req.query.characterId as string);
 
   await deleteCharacter(prisma, characterId);

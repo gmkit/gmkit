@@ -10,7 +10,6 @@ interface Context {
 
 type Handler = (
   req: NextApiRequest,
-  res: NextApiResponse,
   ctx: Context
 ) => object | Promise<object>;
 
@@ -20,7 +19,7 @@ export function handler(cb: Handler): NextApiHandler {
     try {
       const session = await authenticate(req);
       const { userId} = await prisma.session.findOne({ where: { accessToken: session.accessToken }})
-      const responseData = await cb(req, res, { prisma, userId });
+      const responseData = await cb(req, { prisma, userId });
       console.log({ session })
       res.status(200).json(serializeDates(responseData))
     } catch (error) {
@@ -75,5 +74,12 @@ export class UnauthenticatedError extends HttpError {
   status = 401;
   constructor() {
     super('Unauthenticated');
+  }
+}
+
+export class NotImplementedError extends HttpError {
+  status = 501
+  constructor() {
+    super('Not Implemented')
   }
 }
